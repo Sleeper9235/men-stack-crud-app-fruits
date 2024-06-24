@@ -3,6 +3,8 @@ const dotenv = require('dotenv').config()
 // connects to express
 const express = require('express')
 const mongoose = require('mongoose')
+const methodOverride = require('method-override')
+const morgan = require('morgan')
 
 const app = express();
 
@@ -16,6 +18,8 @@ const Fruit = require('./models/fruit.js')
 
 //middleware
 app.use(express.urlencoded({ extended: false }))
+app.use(methodOverride("_method"))
+app.use(morgan("dev"))
 
 // GET /
 app.get("/", async (req, res) => {
@@ -34,7 +38,7 @@ app.get("/fruits/new", (req, res) => {
     res.render('./fruits/new.ejs')
 })
 
-//
+// GET /fruits/:fruitId
 app.get('/fruits/:fruitId', async (req, res) => {
     const foundFruit = await Fruit.findById(req.params.fruitId)
     console.log(foundFruit)
@@ -43,7 +47,26 @@ app.get('/fruits/:fruitId', async (req, res) => {
     })
 })
 
+// GET /fruits/:fruitId/edit
+app.get('/fruits/:fruitId/edit', async (req, res) => {
+    const foundFruit = await Fruit.findById(req.params.fruitId)
+    console.log(foundFruit)
+    res.render('fruits/edit.ejs', {
+        fruit: foundFruit,
+    })
+})
 
+app.put('/fruits/:fruitId', async (req, res) => {
+    if (req.body.isReadyToEat === "on") {
+        req.body.isReadyToEat = true 
+    } else {
+        req.body.isReadyToEat = false
+    }
+
+    await Fruit.findByIdAndUpdate(req.params.fruitId, req.body)
+
+    res.redirect(`/fruits/${req.params.fruitId}`)
+})
 // Post /fruits
 app.post("/fruits", async (req, res) => {
     if (req.body.isReadyToEat === "on") {
@@ -55,7 +78,11 @@ app.post("/fruits", async (req, res) => {
     res.redirect('/fruits')
 })
 
-
+// Delete /fruitId
+app.delete("/fruits/:fruitsId", async (req, res) => {
+    await Fruit.findByIdAndDelete(req.params.fruitsId)
+    res.redirect("/fruits")
+})
 app.listen(3000, () => {
     console.log("Listening on port 3000")
 })
