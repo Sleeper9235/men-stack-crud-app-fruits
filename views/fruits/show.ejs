@@ -1,0 +1,20 @@
+<!-- views/fruits/show.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= fruit.name %></title> <!-- Dynamic title based on fruit name -->
+  </head>
+  <body>
+    <h1><%= fruit.name %></h1> <!-- Display fruit name -->
+    <%- include("../../partials/nav.ejs") %>
+    <!-- Add more details about the fruit here -->
+    <% if (fruit.isReadyToEat) { %>
+        <p>This fruit is ready to eat</p>
+    <% } else { %>
+        <p>This fruit is not ready to eat</p>
+    <% } %>
+  </body>
+</html>
